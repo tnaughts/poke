@@ -2,11 +2,11 @@ import React, {useEffect, useState}   from 'react';
 import gql                            from 'graphql-tag';
 import { useQuery }                   from '@apollo/react-hooks';
 import {
-  FlatList, 
-  View, 
-  Text, 
-  ImageBackground, 
-  TouchableOpacity, 
+  FlatList,
+  View,
+  Text,
+  ImageBackground,
+  TouchableOpacity,
   Picker
 }                                     from 'react-native-web'
 import idx                            from 'idx'
@@ -41,14 +41,14 @@ export const PokemonList = function PokemonList(props){
   const [pokemon, setPokemon] = useState([])
   const [filteredPokemon, setFilteredPokemon] = useState([])
   const { loading, error, data } = useQuery(POKEMON_LIST);
-  
+
   useEffect(
     function setPokemonFromApi(){
       setPokemon(idx(data, _ => _.pokemons) || [])
     },
     [data]
   )
-  
+
   function renderItem({item: pokemon}){
     return <PokemonListCell pokemon={pokemon}/>
   }
@@ -59,7 +59,7 @@ export const PokemonList = function PokemonList(props){
       setPokemon(sortedPokemon)
     }
   }
-  
+
   return <View style={style.container}>
     <h1>Pokemon</h1>
     <View style={style.picker}>
@@ -73,7 +73,7 @@ export const PokemonList = function PokemonList(props){
       <Picker.Item label="Alphabetically" value="name" />
     </Picker>
     </View>
-    {loading ? 
+    {loading ?
       <View style={style.loader}>
         <Loader
            type="Puff"
