@@ -1,7 +1,7 @@
 # Pokemon Viewer
 
-## simple web app to view pokemon information
-## utilizes contentful gql API
+- simple web app to view pokemon information
+- utilizes contentful gql API
 
 ### Dashboard View: 
 ![](ScreenShot.png)
