@@ -41,6 +41,13 @@ export const PokemonList = function PokemonList(props) {
   const [filteredPokemon, setFilteredPokemon] = useState([]);
   const { loading, error, data } = useQuery(POKEMON_LIST);
 
+  useEffect(
+    function setPokemonFromApi() {
+      setPokemon(idx(data, _ => _.pokemonCollection.items) || []);
+    },
+    [data]
+  );
+
   if (!data && loading) {
     return <div>Loading</div>;
   }
@@ -52,14 +59,6 @@ export const PokemonList = function PokemonList(props) {
       </div>
     );
   }
-
-  useEffect(
-    function setPokemonFromApi() {
-      setPokemon(idx(data, _ => _.pokemonCollection.items) || []);
-    },
-    [data]
-  );
-
   function renderItem({ item: pokemon }) {
     return <PokemonListCell pokemon={pokemon} />;
   }
