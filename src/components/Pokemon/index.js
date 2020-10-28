@@ -1,103 +1,112 @@
-import React                from 'react';
-import gql                  from 'graphql-tag';
-import { useQuery }         from '@apollo/react-hooks';
-import {View, Text, Image}  from 'react-native-web'
-import idx                  from 'idx'
-import Loader               from 'react-loader-spinner'
-import {Link}               from 'react-router-dom'
+import React from "react";
+import { useQuery, gql } from "@apollo/client";
+import { View, Text, Image } from "react-native-web";
+import idx from "idx";
+import Loader from "react-loader-spinner";
+import { Link } from "react-router-dom";
 
-import {style}              from './style'
+import { style } from "./style";
 
 const POKEMON = gql`
-  query pokemon($id: String!){
-    pokemon(id: $id){
-      id
+  query pokemon($id: String!) {
+    pokemon(id: $id) {
       name
-      image
+      sys {
+        id
+      }
+      image {
+        url
+      }
       number
       resistant
-      weaknesses
-      height{
-        minimum
-        maximum
-      }
-      weight{
-        minimum
-        maximum
-      }
+      height
+      weight
       classification
-      types,
-      evolutions{
-        id,
-        name
-      },
-      maxHP,
-      maxCP
+      evolutionsCollection {
+        items {
+          name
+          sys {
+            id
+          }
+        }
+      }
     }
   }
-`
+`;
 
-export const Pokemon = function Pokemon(props){
-  const { loading, error, data } = useQuery(POKEMON, {variables: { id: idx(props, _ => _.match.params.id) }});
-  const pokemon = idx(data, _ => _.pokemon)
+export const Pokemon = function Pokemon(props) {
+  const { loading, error, data } = useQuery(POKEMON, {
+    variables: { id: idx(props, _ => _.match.params.id) }
+  });
+  const pokemon = idx(data, _ => _.pokemon);
 
-  function renderEvolutions(){
-    if(pokemon.evolutions.length > 0){
-    return <>
-    <Text style={style.pokemonText}>Evolutions: </Text>
-    {pokemon.evolutions.map( (p) =>{
-         return <li>{p.name}</li>
-      })}</>
+  if (!data && loading) {
+    return (
+      <View style={style.loader}>
+        <Loader
+          type="Puff"
+          color="#00BFFF"
+          height={100}
+          width={100}
+          timeout={3000}
+        />
+      </View>
+    );
+  }
+
+  if (!data || error) {
+    return (
+      <div>
+        Unable to fetch course information, please try again or contact support
+      </div>
+    );
+  }
+
+  function renderEvolutions() {
+    if (pokemon.evolutionsCollection.items.length > 0) {
+      return (
+        <>
+          <Text style={style.pokemonText}>Evolutions: </Text>
+          {pokemon.evolutionsCollection.items.map(p => {
+            return (
+              <Link to={`/pokemon/${p.sys.id}`} key={p.sys.id}>
+                {p.name}
+              </Link>
+            );
+          })}
+        </>
+      );
     }
-    return null
+    return null;
   }
 
   function renderPokemon() {
-    return <View style={style.container}>
-    <Text style={style.title}>{pokemon.name}</Text>
-    <Image source={pokemon.image} style={style.image}/>
-      <View>
-        <Text style={style.pokemonText}>
-          # {pokemon.number}
-        </Text>
-        <Text style={style.pokemonText}>
-          Height: {pokemon.height.minimum} to {pokemon.height.maximum}
-        </Text>
-        <Text style={style.pokemonText}>
-          Weight: {pokemon.weight.minimum} to {pokemon.weight.maximum}
-        </Text>
-        <Text style={style.pokemonText}>
-          Classification: {pokemon.classification}
-        </Text>
-        <Text style={style.pokemonText}>
-          Resistant: {pokemon.resistant.join(", ")}
-        </Text>
-        <Text style={style.pokemonText}>
-          Max HP: {pokemon.maxHP}
-        </Text>
-        <Text style={style.pokemonText}>
-          Max CP: {pokemon.maxCP}
-        </Text>
-        {renderEvolutions()}
+    return (
+      <View style={style.container}>
+        <Text style={style.title}>{pokemon.name}</Text>
+        <Image source={pokemon.image.url} style={style.image} />
+        <View>
+          <Text style={style.pokemonText}># {pokemon.number}</Text>
+          <Text style={style.pokemonText}>Height: {pokemon.height} ft</Text>
+          <Text style={style.pokemonText}>Weight: {pokemon.weight} lbs</Text>
+          <Text style={style.pokemonText}>
+            Classification: {pokemon.classification}
+          </Text>
+          <Text style={style.pokemonText}>
+            {pokemon.resistant
+              ? `Resistant: ${pokemon.resistant.join(", ")}`
+              : "No resistance"}
+          </Text>
+          {renderEvolutions()}
+        </View>
       </View>
-    </View>
+    );
+  }
 
-  }
-  if(pokemon){
-    return <>
-    <Link to="/">
-      Back
-    </Link>
-    {renderPokemon()}</>
-  }
-  if(loading){
-    return <View style={style.loader}>
-      <Loader
-         type="Puff"
-         color="#00BFFF"
-         height={100}
-         width={100}
-         timeout={3000}/>
-      </View>
-  }
-}
+  return (
+    <>
+      <Link to="/">Back</Link>
+      {renderPokemon()}
+    </>
+  );
+};
