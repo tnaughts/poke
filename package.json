@@ -14,7 +14,7 @@
     "apollo-link-context": "^1.0.20",
     "graphql": "14.0.2",
     "idx": "^2.5.6",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "raf": "^3.4.1",
     "react": "16.8.2",
     "react-apollo": "2.4.1",
